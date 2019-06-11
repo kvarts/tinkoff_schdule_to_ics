@@ -49,7 +49,17 @@ def parse_start_end(interval_str):
     return [str(result[0]) + ":00", str(result[1]) + ":00"]
 
 
-def try_convert_to_event(row):
+def create_event(begin, end, is_exclude):
+    return Event(
+        status=("CANCELLED" if is_exclude else None),
+        end=end,
+        begin=begin,
+        name="Рабочая смена",
+        uid=begin.format("YYYY_MM_DD") + "_date"
+    )
+
+
+def convert_row_to_interval(row):
     date_and_interval = row.split(" - ")
     date_str = date_and_interval[0]
     interval_str = date_and_interval[1]
@@ -65,12 +75,53 @@ def try_convert_to_event(row):
         end_time = "00:" + str(end_time_parts[1]) + ":" + str(end_time_parts[2])
         end_date = end_date + datetime.timedelta(days=1)
 
-    e = Event()
-    e.name = "На работу!"
-    e.begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "%YYYY%MM%DD %HH:%mm:%ss").replace(tzinfo='Europe/Moscow')
-    e.end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "%YYYY%MM%DD %HH:%mm:%ss").replace(tzinfo='Europe/Moscow')
+    begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "%YYYY%MM%DD %HH:%mm:%ss").replace(tzinfo='Europe/Moscow')
+    end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "%YYYY%MM%DD %HH:%mm:%ss").replace(tzinfo='Europe/Moscow')
 
-    return e
+    return create_interval(begin, end)
+
+
+def create_interval(begin, end, is_exclude=False):
+    return {"begin": begin, "end": end, "is_exclude": is_exclude}
+
+
+def get_begin(interval):
+    return interval["begin"]
+
+
+def get_end(interval):
+    return interval["end"]
+
+
+def is_exclude(interval):
+    return interval["is_exclude"]
+
+
+def create_events(intervals):
+    intervals.sort(key=get_begin)
+
+    first_date = get_begin(intervals[0])
+    last_date = get_begin(intervals[-1])
+
+    next_date = first_date.replace(days=1)
+    while next_date <= last_date:
+        is_in_interval = False
+        for interval in intervals:
+            if get_begin(interval).format("YYYY_MM_DD") == next_date.format("YYYY_MM_DD"):
+                is_in_interval = True
+                break
+
+        if not is_in_interval:
+            intervals.append(create_interval(next_date, next_date, True))
+
+        next_date = next_date.replace(days=1)
+
+    events = []
+
+    for interval in intervals:
+        events.append(create_event(get_begin(interval), get_end(interval), is_exclude(interval)))
+
+    return events
 
 
 def try_convert_schedule(update, context):
@@ -80,17 +131,23 @@ def try_convert_schedule(update, context):
 
     try:
         rows = text.split("\n")
+        intervals = []
 
-        c = Calendar()
         for row in rows:
             try:
-                e = try_convert_to_event(row)
-                if e is not None:
-                    c.events.add(e)
+                interval = convert_row_to_interval(row)
+                if interval is not None:
+                    intervals.append(interval)
             except:
                 print('error in Parse row = ' + row)
 
-        content = str(c).replace("\r", "")
+        events = create_events(intervals)
+
+        calendar = Calendar()
+        for event in events:
+            calendar.events.add(event)
+
+        content = str(calendar).replace("\r", "")
         filename = 'schedule_' + str(time.time()) + '.ics'
         with open(filename, 'w', encoding='utf-8') as my_file:
             my_file.write(content)
