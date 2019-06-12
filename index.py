@@ -154,7 +154,8 @@ def try_convert_schedule(update, context):
 
         context.bot.send_document(chat_id=update.effective_message.chat_id, document=open(filename, 'rb'))
 
-    except:
+    except Exception as e:
+        print(e)
         context.bot.send_message(chat_id=update.effective_message.chat_id, text="Ошибочка вышла 😔\nОбратитесь к https://t.me/ivan_kochergin")
 
 
