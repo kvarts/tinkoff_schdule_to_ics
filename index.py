@@ -75,8 +75,8 @@ def convert_row_to_interval(row):
         end_time = "00:" + str(end_time_parts[1]) + ":" + str(end_time_parts[2])
         end_date = end_date + datetime.timedelta(days=1)
 
-    begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "%YYYY%MM%DD %HH:%mm:%ss").replace(tzinfo='Europe/Moscow')
-    end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "%YYYY%MM%DD %HH:%mm:%ss").replace(tzinfo='Europe/Moscow')
+    begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "YYYYMMDD HH:mm:ss").replace(tzinfo='Europe/Moscow')
+    end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "YYYYMMDD HH:mm:ss").replace(tzinfo='Europe/Moscow')
 
     return create_interval(begin, end)
 
@@ -138,7 +138,8 @@ def try_convert_schedule(update, context):
                 interval = convert_row_to_interval(row)
                 if interval is not None:
                     intervals.append(interval)
-            except:
+            except Exception as e:
+                context.bot.send_message(chat_id=update.effective_message.chat_id, text=e.__str__())
                 print('error in Parse row = ' + row)
 
         events = create_events(intervals)
@@ -155,8 +156,8 @@ def try_convert_schedule(update, context):
         context.bot.send_document(chat_id=update.effective_message.chat_id, document=open(filename, 'rb'))
 
     except Exception as e:
-        print(e)
-        context.bot.send_message(chat_id=update.effective_message.chat_id, text="Ошибочка вышла 😔\nОбратитесь к https://t.me/ivan_kochergin")
+        context.bot.send_message(chat_id=update.effective_message.chat_id,
+                                 text="Ошибочка вышла 😔\nОбратитесь к https://t.me/ivan_kochergin")
 
 
 def main():
