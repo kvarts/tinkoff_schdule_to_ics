@@ -4,6 +4,7 @@ import re
 import datetime
 import arrow
 import time
+import traceback
 from ics import Calendar, Event
 from telegram.ext import Updater, MessageHandler, Filters
 
@@ -148,9 +149,9 @@ def try_convert_schedule(update, context):
                 if interval is not None:
                     intervals.append(interval)
             except Exception as e:
-                print(e.__str__())
-                print(e.__traceback__.__str__())
                 print('error in Parse row = ' + row)
+                print(e.__str__())
+                traceback.print_exc()
 
         events = create_events(intervals)
 
@@ -167,7 +168,7 @@ def try_convert_schedule(update, context):
 
     except Exception as e:
         print(e.__str__())
-        print(e.__traceback__.__str__())
+        traceback.print_exc()
         context.bot.send_message(chat_id=update.effective_message.chat_id,
                                  text="Ошибочка вышла 😔\nОбратитесь к https://t.me/ivan_kochergin")
 
