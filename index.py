@@ -77,6 +77,7 @@ def convert_row_to_interval(row):
         end_date = end_date + datetime.timedelta(days=1)
     elif int(end_time_parts[0]) < 10:
         end_time = "0" + str(int(end_time_parts[0])) + ":" + str(end_time_parts[1]) + ":" + str(end_time_parts[2])
+        end_date = end_date + datetime.timedelta(days=1)
 
     start_time_parts = start_time.split(":")
     if int(start_time_parts[0]) == 24:
@@ -151,7 +152,6 @@ def try_convert_schedule(update, context):
             except Exception as e:
                 print('error in Parse row = ' + row)
                 print(e.__str__())
-                traceback.print_exc()
 
         events = create_events(intervals)
 
