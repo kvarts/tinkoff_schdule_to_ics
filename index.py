@@ -148,7 +148,8 @@ def try_convert_schedule(update, context):
                 if interval is not None:
                     intervals.append(interval)
             except Exception as e:
-                context.bot.send_message(chat_id=update.effective_message.chat_id, text=e.__str__())
+                print(e.__str__())
+                print(e.__traceback__.__str__())
                 print('error in Parse row = ' + row)
 
         events = create_events(intervals)
@@ -165,6 +166,8 @@ def try_convert_schedule(update, context):
         context.bot.send_document(chat_id=update.effective_message.chat_id, document=open(filename, 'rb'))
 
     except Exception as e:
+        print(e.__str__())
+        print(e.__traceback__.__str__())
         context.bot.send_message(chat_id=update.effective_message.chat_id,
                                  text="Ошибочка вышла 😔\nОбратитесь к https://t.me/ivan_kochergin")
 
