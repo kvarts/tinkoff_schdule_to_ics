@@ -84,8 +84,8 @@ def convert_row_to_interval(row):
     elif int(start_time_parts[0]) < 10:
         start_time = "0" + str(int(start_time_parts[0])) + ":" + str(start_time_parts[1]) + ":" + str(start_time_parts[2])
 
-    begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "YYYYMMDD H:mm:ss").replace(tzinfo='Europe/Moscow')
-    end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "YYYYMMDD H:mm:ss").replace(tzinfo='Europe/Moscow')
+    begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "YYYYMMDD HH:mm:ss").replace(tzinfo='Europe/Moscow')
+    end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "YYYYMMDD HH:mm:ss").replace(tzinfo='Europe/Moscow')
 
     return create_interval(begin, end)
 
