@@ -75,8 +75,8 @@ def convert_row_to_interval(row):
         end_time = "00:" + str(end_time_parts[1]) + ":" + str(end_time_parts[2])
         end_date = end_date + datetime.timedelta(days=1)
 
-    begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "YYYYMMDD HH:mm:ss").replace(tzinfo='Europe/Moscow')
-    end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "YYYYMMDD HH:mm:ss").replace(tzinfo='Europe/Moscow')
+    begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "YYYYMMDD H:mm:ss").replace(tzinfo='Europe/Moscow')
+    end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "YYYYMMDD H:mm:ss").replace(tzinfo='Europe/Moscow')
 
     return create_interval(begin, end)
 
