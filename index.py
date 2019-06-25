@@ -74,6 +74,15 @@ def convert_row_to_interval(row):
     if int(end_time_parts[0]) == 24:
         end_time = "00:" + str(end_time_parts[1]) + ":" + str(end_time_parts[2])
         end_date = end_date + datetime.timedelta(days=1)
+    elif int(end_time_parts[0]) < 10:
+        end_time = "0" + str(int(end_time_parts[0])) + ":" + str(end_time_parts[1]) + ":" + str(end_time_parts[2])
+
+    start_time_parts = start_time.split(":")
+    if int(start_time_parts[0]) == 24:
+        start_time = "00:" + str(start_time_parts[1]) + ":" + str(start_time_parts[2])
+        start_date = start_date + datetime.timedelta(days=1)
+    elif int(start_time_parts[0]) < 10:
+        start_time = "0" + str(int(start_time_parts[0])) + ":" + str(start_time_parts[1]) + ":" + str(start_time_parts[2])
 
     begin = arrow.get(start_date.strftime("%Y%m%d ") + start_time, "YYYYMMDD H:mm:ss").replace(tzinfo='Europe/Moscow')
     end = arrow.get(end_date.strftime("%Y%m%d ") + end_time, "YYYYMMDD H:mm:ss").replace(tzinfo='Europe/Moscow')
